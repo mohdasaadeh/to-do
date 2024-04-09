@@ -12,14 +12,14 @@ const trpc = createTRPCClient<AppRouter>({
 
 trpc.register
   .mutate({
-    name: "mohammad",
+    username: "mohammad",
     password: "testtest",
   })
   .then((response) => {
     console.log(response);
 
     trpc.login
-      .query({ name: "mohammad", password: "testtest" })
+      .query({ username: "mohammad", password: "testtest" })
       .then((response) => {
         console.log(response);
       });

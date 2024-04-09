@@ -1,19 +1,31 @@
-type User = { id: string; name: string; password: string };
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import { sql, eq } from "drizzle-orm";
 
-const users: User[] = [];
+import * as schema from "./schema";
 
-export const db = {
+const client = createClient({
+  url: process.env.DATABASE_URL || "",
+  authToken: process.env.DATABASE_TOKEN,
+});
+
+const db = drizzle(client, { schema });
+
+type User = { id: number; username: string; password: string };
+
+export const services = {
   user: {
-    find: async (data: Omit<User, "id">) =>
-      users.find(
-        (user) => user.name === data.name && user.password === data.password
-      ),
+    find: async (data: Omit<User, "id">) => {
+      return db.query.users.findFirst({
+        where: (users, { eq }) =>
+          eq(users.username, data.username) &&
+          eq(users.password, data.password),
+      });
+    },
     create: async (data: Omit<User, "id">) => {
-      const user = { id: String(users.length + 1), ...data };
-
-      users.push(user);
-
-      return user;
+      return db
+        .insert(schema.users)
+        .values({ username: data.username, password: data.password });
     },
   },
 };
