@@ -25,7 +25,8 @@ export const services = {
     create: async (data: Omit<User, "id">) => {
       return db
         .insert(schema.users)
-        .values({ username: data.username, password: data.password });
+        .values({ username: data.username, password: data.password })
+        .returning();
     },
   },
 };
